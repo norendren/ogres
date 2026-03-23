@@ -49,7 +49,8 @@
    {:name "mask-create"   :keys [\f]}
    {:name "mask-toggle"   :keys [\t]}
    {:name "mask-remove"   :keys [\x]}
-   {:name "note"          :keys [\a]}])
+   {:name "note"          :keys [\a]}
+   {:name "tool-hide"     :keys [\h]}])
 
 (def ^:private panel->upload-type
   {:tokens :token
@@ -119,6 +120,12 @@
                   (dispatch :objects/translate (js/Number (.-id attrs)) (vec/mul delta 70))
                   (= (.-activeElement js/document) (.-body js/document))
                   (dispatch :objects/translate-selected (vec/mul delta 70)))))))
+
+    ;; Toggle the toolbar visibility.
+    (hooks/use-shortcut [\h]
+      (fn [data]
+        (if (allowed? (.-originalEvent data))
+          (dispatch :user/toggle-toolbar))))
 
     ;; Cut and copy objects.
     ;; Writing an empty string to the system clipboard ensures that a subsequent

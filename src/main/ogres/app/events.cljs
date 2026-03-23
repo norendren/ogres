@@ -99,6 +99,13 @@
     [{:db/ident :user :panel/expanded (not (get user :panel/expanded true))}]))
 
 (defmethod
+  ^{:doc "Toggle the collapsed state of the toolbar."}
+  event-tx-fn :user/toggle-toolbar
+  [data]
+  (let [user (ds/entity data [:db/ident :user])]
+    [{:db/ident :user :toolbar/collapsed (not (get user :toolbar/collapsed false))}]))
+
+(defmethod
   ^{:doc "Changes the character label for the given user."}
   event-tx-fn :user/change-label
   ([_ _ value]

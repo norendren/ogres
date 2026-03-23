@@ -8,27 +8,28 @@
   (into {} (map (juxt :name :keys)) shortcuts))
 
 (def ^:private action-data
-  {"copy-copy"    {:label "Copy the selected objects." :args [:clipboard/copy false]}
-   "copy-cut"     {:label "Copy and remove the selected objects." :args [:clipboard/copy true]}
-   "copy-paste"   {:label "Paste copied objects onto the scene." :args [:clipboard/paste]}
-   "draw-circle"  {:label "Draw a circle." :args [:camera/change-mode :circle]}
-   "draw-cone"    {:label "Draw a cone." :args [:camera/change-mode :cone]}
-   "draw-line"    {:label "Draw a line." :args [:camera/change-mode :line]}
-   "draw-poly"    {:label "Draw a polygon." :args [:camera/change-mode :poly]}
-   "draw-rect"    {:label "Draw a rectangle." :args [:camera/change-mode :rect]}
-   "mask-create"  {:label "Create a new mask." :args [:camera/change-mode :mask]}
-   "mask-hide"    {:label "Mask the entire scene." :args [:scene/mask]}
-   "mask-remove"  {:label "Remove a mask." :args [:camera/change-mode :mask-remove]}
-   "mask-show"    {:label "Reveal the entire scene." :args [:scene/reveal]}
-   "mask-toggle"  {:label "Toggle a mask on and off." :args [:camera/change-mode :mask-toggle]}
-   "scene-focus"  {:label "Focus the current view." :args [:session/focus]}
-   "scene-grid"   {:label "Grid alignment tool." :args [:camera/change-mode :grid]}
-   "scene-ruler"  {:label "Measure distance." :args [:camera/change-mode :ruler]}
-   "scene-select" {:label "Hold shift to select multiple tokens." :args [:camera/change-mode :select]}
-   "zoom-in"      {:label "Zoom in." :args [:camera/zoom-in]}
-   "zoom-out"     {:label "Zoom out." :args [:camera/zoom-out]}
-   "zoom-reset"   {:label "Reset to 100% zoom." :args [:camera/zoom-reset]}
-   "note"         {:label "Create a note." :args [:camera/change-mode :note]}})
+  {"copy-copy"       {:label "Copy the selected objects." :args [:clipboard/copy false]}
+   "copy-cut"        {:label "Copy and remove the selected objects." :args [:clipboard/copy true]}
+   "copy-paste"      {:label "Paste copied objects onto the scene." :args [:clipboard/paste]}
+   "draw-circle"     {:label "Draw a circle." :args [:camera/change-mode :circle]}
+   "draw-cone"       {:label "Draw a cone." :args [:camera/change-mode :cone]}
+   "draw-line"       {:label "Draw a line." :args [:camera/change-mode :line]}
+   "draw-poly"       {:label "Draw a polygon." :args [:camera/change-mode :poly]}
+   "draw-rect"       {:label "Draw a rectangle." :args [:camera/change-mode :rect]}
+   "mask-create"     {:label "Create a new mask." :args [:camera/change-mode :mask]}
+   "mask-hide"       {:label "Mask the entire scene." :args [:scene/mask]}
+   "mask-remove"     {:label "Remove a mask." :args [:camera/change-mode :mask-remove]}
+   "mask-show"       {:label "Reveal the entire scene." :args [:scene/reveal]}
+   "mask-toggle"     {:label "Toggle a mask on and off." :args [:camera/change-mode :mask-toggle]}
+   "scene-focus"     {:label "Focus the current view." :args [:session/focus]}
+   "scene-grid"      {:label "Grid alignment tool." :args [:camera/change-mode :grid]}
+   "scene-ruler"     {:label "Measure distance." :args [:camera/change-mode :ruler]}
+   "scene-select"    {:label "Hold shift to select multiple tokens." :args [:camera/change-mode :select]}
+   "zoom-in"         {:label "Zoom in." :args [:camera/zoom-in]}
+   "zoom-out"        {:label "Zoom out." :args [:camera/zoom-out]}
+   "zoom-reset"      {:label "Reset to 100% zoom." :args [:camera/zoom-reset]}
+   "note"            {:label "Create a note." :args [:camera/change-mode :note]}
+   "tool-hide"  {:label "Hide the toolbar." :args [:user/toggle-toolbar]}})
 
 (defui ^:private action [props]
   ($ :button
@@ -42,6 +43,7 @@
   [:session/_host
    :user/clipboard
    [:user/host :default true]
+   [:toolbar/collapsed :default false]
    {:user/camera
     [:camera/selected
      [:camera/draw-mode :default :select]
@@ -52,26 +54,31 @@
         dispatch  (hooks/use-dispatch)
         result    (hooks/use-query query)
         {host      :user/host
+         collapsed :toolbar/collapsed
          {scale    :camera/scale
           mode     :camera/draw-mode
           selected :camera/selected} :user/camera} result
         on-focus (uix/use-callback
                   (fn [event]
-                    (if-let [node (.. event -target (closest "button"))]
+                    (if-let [node (.. event -target (closest "button[name]"))]
                       (set-focused (.-name node)))) [])
         on-click (uix/use-callback
                   (fn [event]
-                    (let [node (.. event -target (closest "button"))]
+                    (let [node (.. event -target (closest "button[name]"))]
                       (if (and (some? node) (not= (.getAttribute node "aria-disabled") "true"))
                         (apply dispatch (get-in action-data [(.-name node) :args]))))) [dispatch])]
     ($ :.toolbar
-      {:data-user (if host "host" "conn") :on-pointer-leave #(set-focused nil)}
+      {:data-user (if host "host" "conn")
+       :data-collapsed collapsed
+       :on-pointer-leave #(set-focused nil)}
       (if focused
         ($ :.toolbar-tooltip
           (if-let [shortcut (shortcut-keys focused)]
             ($ :.toolbar-shortcut
               ($ :code (apply str (interpose "+" shortcut)))))
-          (get-in action-data [focused :label])))
+          (if (and (= focused "tool-hide") collapsed)
+            "Unhide the toolbar."
+            (get-in action-data [focused :label]))))
       ($ :.toolbar-actions
         {:role "toolbar"
          :on-pointer-over on-focus
@@ -119,4 +126,6 @@
         ($ action {:name "mask-hide"}
           ($ icon {:name "eye-slash-fill"}))
         ($ action {:name "scene-grid" :aria-pressed (= mode :grid)}
-          ($ icon {:name "compass"}))))))
+          ($ icon {:name "compass"}))
+        ($ action {:name "tool-hide"}
+          ($ icon {:name (if collapsed "arrow-up-short" "arrow-down-short")}))))))

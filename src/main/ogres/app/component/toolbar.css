@@ -181,6 +181,10 @@
   [name="note"] {
     grid-area: not;
   }
+
+  [name="tool-hide"] {
+    grid-area: tog;
+  }
 }
 
 @media only screen and (max-width: 1199px) {
@@ -189,9 +193,9 @@
   }
 
   .toolbar-actions {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(1, 1fr);
-    grid-template-areas: "sel rul crc rct con lne";
+    grid-template-areas: "sel rul crc rct con lne tog";
 
     &
       > button:not(
@@ -200,7 +204,8 @@
         [name="draw-circle"],
         [name="draw-rect"],
         [name="draw-cone"],
-        [name="draw-line"]
+        [name="draw-line"],
+        [name="tool-hide"]
       ) {
       display: none;
     }
@@ -214,15 +219,15 @@
       grid-template-rows: repeat(2, 1fr);
       grid-template-areas:
         "sel cut cop pst rul not fcs crc rct con ply lne"
-        "zot zrt zrt zrt zin msk mtg mrm msh mhi grd .";
+        "zot zrt zrt zrt zin msk mtg mrm msh mhi grd tog";
     }
 
     &[data-user="conn"] .toolbar-actions {
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(8, 1fr);
       grid-template-rows: repeat(2, 1fr);
       grid-template-areas:
-        "sel cut cop pst rul crc rct"
-        "zot zrt zrt zin con ply lne";
+        "sel cut cop pst rul crc rct tog"
+        "zot zrt zrt zin con ply lne tog";
 
       &
         > button:not(
@@ -238,10 +243,24 @@
           [name="zoom-reset"],
           [name="zoom-in"],
           [name="draw-cone"],
-          [name="draw-poly"]
+          [name="draw-poly"],
+          [name="tool-hide"]
         ) {
         display: none;
       }
+    }
+  }
+}
+
+.toolbar[data-collapsed="true"] {
+  .toolbar-actions {
+    width: fit-content;
+    grid-template-columns: 38px;
+    grid-template-rows: 38px;
+    grid-template-areas: "tog";
+
+    & > button:not([name="tool-hide"]) {
+      display: none;
     }
   }
 }
