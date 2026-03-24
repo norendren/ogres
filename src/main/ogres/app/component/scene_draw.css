@@ -13,6 +13,7 @@
 .scene-draw-shape {
   fill: var(--scene-stroke);
   fill-opacity: 0.1;
+  filter: url(#mask-outline);
   stroke-dasharray: 16px 3px;
   stroke: var(--scene-stroke);
 }
@@ -24,19 +25,23 @@
 
 .scene-draw-anchor {
   fill: var(--scene-stroke);
+  filter: url(#mask-outline);
 }
 
 .scene-draw-anchor-ring {
   fill: none;
+  filter: url(#mask-outline);
   stroke: var(--scene-stroke);
 }
 
 .scene-draw-point {
   fill: var(--scene-stroke);
+  filter: url(#mask-outline);
 }
 
 .scene-draw-point-ring {
   fill: none;
+  filter: url(#mask-outline);
   stroke: var(--scene-stroke);
 }
 

@@ -122,6 +122,13 @@
            masked :scene/masked} :camera/scene} :user/camera} result]
     ($ :defs
       ($ pattern {:id "mask-pattern" :name :crosses})
+      ($ :filter {:id "mask-outline"}
+        ($ :feMorphology {:in "SourceAlpha" :result "expanded" :operator "dilate" :radius "1"})
+        ($ :feFlood {:flood-color "black" :result "outline-color"})
+        ($ :feComposite {:in "outline-color" :in2 "expanded" :operator "in" :result "outline"})
+        ($ :feMerge
+          ($ :feMergeNode {:in "outline"})
+          ($ :feMergeNode {:in "SourceGraphic"})))
       ($ :path {:id "masks-path" :d (transduce mask-area-xf poly->path masks)})
       ($ :path {:id "light-path" :d (transduce (token-light-xf host) circle->path tokens)})
       ($ :clipPath {:id "masks-clip"}
