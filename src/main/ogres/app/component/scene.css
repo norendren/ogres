@@ -69,6 +69,7 @@
   .scene-mask-polygon {
     cursor: pointer;
     fill: none;
+    filter: url(#mask-outline);
     stroke-width: 2px;
     stroke: var(--scene-stroke);
 
