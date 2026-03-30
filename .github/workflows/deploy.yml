@@ -79,14 +79,14 @@ jobs:
           SERVER_SOCKET_URL: ${{ vars.SERVER_SOCKET_URL || 'ws://localhost:5000/ws' }}
         run: |
           clojure -M -m shadow.cljs.devtools.cli release app \
-            --config-merge "{:closure-defines {ogres.app.const/VERSION \"latest\" ogres.app.const/PATH \"/release/latest\" ogres.app.const/SOCKET-URL \"${SERVER_SOCKET_URL}\"}}"
+            --config-merge "{:closure-defines {ogres.app.const/VERSION \"latest\" ogres.app.const/PATH \"/play/release/latest\" ogres.app.const/SOCKET-URL \"${SERVER_SOCKET_URL}\"}}"
 
       - name: Assemble site
         run: |
           mkdir -p _site/play
           cp -r site/web/. _site/
           cp web/index.html _site/play/index.html
-          cp -r web/release _site/release
+          cp -r web/release _site/play/release
           cp web/releases.txt _site/releases.txt
           cp CNAME _site/CNAME
 
