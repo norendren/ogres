@@ -1,5 +1,6 @@
 (ns ogres.app.provider.idb
-  (:require [ogres.app.provider.events :as events]
+  (:require [ogres.app.const :refer [VERSION]]
+            [ogres.app.provider.events :as events]
             [uix.core :as uix :refer [defui $]]
             [shadow.cljs.modern :refer (js-await)]
             ["@msgpack/msgpack" :as MessagePack]))
@@ -145,6 +146,16 @@
          (js-await [idb req]
            (-> (MessagePack/decodeAsync (.stream file))
                (.then unmarshal)
+               (.then (fn [db]
+                        ;; Normalize the release field in app store records to
+                        ;; match the currently deployed version. Without this,
+                        ;; restoring a backup from a different site (e.g. ogres.app
+                        ;; at v0.2.5) causes index.html to request a release path
+                        ;; that doesn't exist on this deployment.
+                        (let [app-records (aget db "app")]
+                          (when app-records
+                            (.forEach app-records #(aset % "release" VERSION))))
+                        db))
                (.then (fn [db] (js/Promise.all (.map (js/Object.entries db) (fn [store] (replace-store idb store))))))
                (.then (fn [] (.. js/window -location reload)))
                (.catch js/console.error)))) [req]))))

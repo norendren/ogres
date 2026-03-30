@@ -106,7 +106,7 @@
         (.sendText (.getAsyncRemote session) serialized)))))
 
 (defn handle-root [_]
-  {:status 405})
+  {:status 200})
 
 (defn handle-ws [{{host :host join :join} :params}]
   (let [data (deref state!)]
