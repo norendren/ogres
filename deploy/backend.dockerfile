@@ -3,6 +3,8 @@
 FROM clojure:temurin-21-tools-deps-bookworm AS builder
 RUN mkdir -p /build
 WORKDIR /build
+COPY deps.edn /build/
+RUN clojure -P -T:build
 COPY ./ /build
 RUN clojure -T:build uber :out ogres-server.jar
 
