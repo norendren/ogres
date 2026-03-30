@@ -1,6 +1,6 @@
 # Reference: https://practical.li/engineering-playbook/continuous-integration/docker/clojure-multi-stage-dockerfile/
 
-FROM clojure:temurin-21-tools-deps-bookworm AS builder
+FROM clojure:temurin-21-tools-deps-alpine AS builder
 RUN mkdir -p /build
 WORKDIR /build
 COPY deps.edn /build/
