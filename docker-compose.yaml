@@ -30,6 +30,8 @@ services:
     build:
       context: .
       dockerfile: ./deploy/backend.dockerfile
+    environment:
+      PORT: "8090"
     expose:
       # The websocket connection exposed by the server
       - "8090"

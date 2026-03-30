@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: ogres-server
+    runtime: docker
+    dockerfilePath: ./deploy/backend.dockerfile
+    dockerContext: .
+    # Render automatically injects PORT; the server reads it on startup.
+    # Free tier spins down after ~15 min of inactivity (cold-start ~1-2s).
+    plan: free

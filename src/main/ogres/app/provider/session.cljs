@@ -2,7 +2,7 @@
   (:require [cognitect.transit :as transit]
             [datascript.core :as ds]
             [goog.functions :refer [throttle]]
-            [ogres.app.const :refer [SOCKET-URL]]
+            [ogres.app.const :refer [socket-url]]
             [ogres.app.hooks :as hooks]
             [ogres.app.provider.idb :as idb]
             [ogres.app.provider.state :as state]
@@ -204,8 +204,8 @@
          (let [host (ds/entity @conn [:db/ident :user])
                conn (js/WebSocket.
                      (if (:session/last-room host)
-                       (str SOCKET-URL "?host=" (:session/last-room host))
-                       SOCKET-URL))]
+                       (str socket-url "?host=" (:session/last-room host))
+                       socket-url))]
            (set-socket conn))) [conn]))
 
     ;; Subscribe to requests to join the session, creating a WebSocket
@@ -217,7 +217,7 @@
                params (js/URLSearchParams. search)
                room   (.get params "join")]
            (if (some? room)
-             (let [conn (js/WebSocket. (str SOCKET-URL "?join=" room))]
+             (let [conn (js/WebSocket. (str socket-url "?join=" room))]
                (set-socket conn))))) []))
 
     ;; Subscribe to regular heartbeat events, rebroadcasting it to the other

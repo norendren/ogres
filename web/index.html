@@ -27,6 +27,10 @@
         <meta name="description" content="Free online virtual tabletop">
 
         <title>Ogres &ndash; Play: Free online virtual tabletop</title>
+        <!-- Self-hosting: uncomment and set this to your WebSocket backend URL.
+             This overrides the compile-time SOCKET-URL without needing a rebuild.
+             Example: window.OGRES_SOCKET_URL = "wss://your-server.onrender.com/ws"; -->
+        <script>/* window.OGRES_SOCKET_URL = ""; */</script>
         <script>
             function initialize(path) {
                 let element = document.createElement("script");
