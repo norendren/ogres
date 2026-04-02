@@ -137,7 +137,10 @@
             (send session {:type :event :src uuid :dst uuid :data {:name :session/created :room room :uuid uuid}})))
     session))
 
-(defn handle-ws-close [session _ _]
+(defn handle-ws-close [session _ close-reason]
+  (let [code   (some-> close-reason .getCloseCode .getCode)
+        phrase (some-> close-reason .getReasonPhrase)]
+    (log/info :msg "ws-close" :uuid (.getId session) :code code :reason phrase))
   (let [data (deref state!)
         uuid (.getId session)
         room (get-in data [:conns uuid :room])
@@ -163,7 +166,10 @@
     (swap! state! room-leave uuid)))
 
 (defn handle-ws-error [_ _ error]
-  (log/error :message (.getMessage error)))
+  (log/error :msg "ws-error"
+             :error-type (-> error .getClass .getSimpleName)
+             :message (.getMessage error)
+             :cause (some-> error .getCause .getMessage)))
 
 (defn handle-ws-text [session message]
   (stat-size-message! (.length message))
@@ -216,4 +222,8 @@
 
 (defn -main
   ([] (-main (or (System/getenv "PORT") "5000")))
-  ([port] (conn/start! (create-connector {:port (Integer/parseInt port)}))))
+  ([port]
+   (.addShutdownHook
+    (Runtime/getRuntime)
+    (Thread. #(log/info :msg "JVM shutdown hook fired — process exiting")))
+   (conn/start! (create-connector {:port (Integer/parseInt port)}))))
