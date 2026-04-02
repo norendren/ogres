@@ -24,6 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Read version
+        run: echo "OGRES_VERSION=$(tail -1 web/releases.txt)" >> $GITHUB_ENV
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -79,7 +82,7 @@ jobs:
           SERVER_SOCKET_URL: ${{ vars.SERVER_SOCKET_URL || 'ws://localhost:5000/ws' }}
         run: |
           clojure -M -m shadow.cljs.devtools.cli release app \
-            --config-merge "{:closure-defines {ogres.app.const/VERSION \"latest\" ogres.app.const/PATH \"/play/release/latest\" ogres.app.const/SOCKET-URL \"${SERVER_SOCKET_URL}\"}}"
+            --config-merge "{:closure-defines {ogres.app.const/VERSION \"${{ env.OGRES_VERSION }}\" ogres.app.const/PATH \"/play/release/latest\" ogres.app.const/SOCKET-URL \"${SERVER_SOCKET_URL}\"}}"
 
       - name: Assemble site
         run: |
