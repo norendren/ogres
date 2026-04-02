@@ -66,23 +66,23 @@ jobs:
 
       - name: Build CSS
         run: |
-          mkdir -p web/release/latest
+          mkdir -p web/release/${{ env.OGRES_VERSION }}
           npx esbuild \
             --bundle \
             --minify \
             --loader:.svg=dataurl \
-            --outfile=web/release/latest/ogres.app.css \
+            --outfile=web/release/${{ env.OGRES_VERSION }}/ogres.app.css \
             src/main/ogres/app/resource/root.css
-          cp web/release/icons.svg web/release/latest/icons.svg
+          cp web/release/icons.svg web/release/${{ env.OGRES_VERSION }}/icons.svg
 
       - name: Build ClojureScript
         env:
-          OUTPUT_DIR: web/release/latest
-          ASSET_PATH: release/latest
+          OUTPUT_DIR: web/release/${{ env.OGRES_VERSION }}
+          ASSET_PATH: release/${{ env.OGRES_VERSION }}
           SERVER_SOCKET_URL: ${{ vars.SERVER_SOCKET_URL || 'ws://localhost:5000/ws' }}
         run: |
           clojure -M -m shadow.cljs.devtools.cli release app \
-            --config-merge "{:closure-defines {ogres.app.const/VERSION \"${{ env.OGRES_VERSION }}\" ogres.app.const/PATH \"/play/release/latest\" ogres.app.const/SOCKET-URL \"${SERVER_SOCKET_URL}\"}}"
+            --config-merge "{:closure-defines {ogres.app.const/VERSION \"${{ env.OGRES_VERSION }}\" ogres.app.const/PATH \"/play/release/${{ env.OGRES_VERSION }}\" ogres.app.const/SOCKET-URL \"${SERVER_SOCKET_URL}\"}}"
 
       - name: Assemble site
         run: |

@@ -157,7 +157,8 @@
                             (.forEach app-records #(aset % "release" VERSION))))
                         db))
                (.then (fn [db] (js/Promise.all (.map (js/Object.entries db) (fn [store] (replace-store idb store))))))
-               (.then (fn [] (.. js/window -location reload)))
+               (.then (fn [] (set! (.. js/window -location -href)
+                                   (str (.. js/window -location -pathname) "?r=" VERSION))))
                (.catch js/console.error)))) [req]))))
 
 (defui provider
