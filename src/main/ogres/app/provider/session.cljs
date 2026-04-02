@@ -11,8 +11,9 @@
             [uix.core :as uix :refer [defui]]
             ["@msgpack/msgpack" :as MessagePack]))
 
-(def ^:private interval-heartbeat 20000)
-(def ^:private interval-reconnect 5000)
+(def ^:private interval-heartbeat  20000)
+(def ^:private interval-keepalive  60000)
+(def ^:private interval-reconnect   5000)
 
 (def ^:private color-options
   ["blue" "yellow" "green" "purple" "orange"])
@@ -184,6 +185,16 @@
           (if (and (not (:user/host user))
                    (= (:session/status user) :connected))
             (dispatch :session/heartbeat)))) [conn dispatch]), interval-heartbeat)
+
+    ;; Periodically send an HTTP request to keep the Render.com host process
+    ;; alive. Render's inactivity timer tracks HTTP requests, not WebSocket
+    ;; frames, so this fires for any connected user (host or player).
+    (hooks/use-interval
+     (uix/use-callback
+      (fn []
+        (let [user (ds/entity @conn [:db/ident :user])]
+          (when (= (:session/status user) :connected)
+            (js/fetch (str "/keepalive?uuid=" (:user/uuid user)))))) [conn]) interval-keepalive)
 
     ;; Subscribe to requests to create a new session, creating a WebSocket
     ;; connection object.

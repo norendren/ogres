@@ -108,6 +108,11 @@
 (defn handle-root [_]
   {:status 200})
 
+(defn handle-keepalive [request]
+  (let [uuid (get-in request [:params :uuid])]
+    (log/info :msg "keepalive" :uuid uuid)
+    {:status 200}))
+
 (defn handle-ws [{{host :host join :join} :params}]
   (let [data (deref state!)]
     (cond (and host join)
@@ -216,8 +221,9 @@
        (assoc :host host)
        (conn/with-default-interceptors)
        (conn/with-routes
-         #{["/"   :get [handle-root]]
-           ["/ws" :get [handle-ws upgrade-ws]]})
+         #{["/"           :get [handle-root]]
+           ["/keepalive"  :get [handle-keepalive]]
+           ["/ws"         :get [handle-ws upgrade-ws]]})
        (jetty/create-connector nil))))
 
 (defn -main
