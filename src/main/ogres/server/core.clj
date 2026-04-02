@@ -111,7 +111,7 @@
 (defn handle-keepalive [request]
   (let [uuid (get-in request [:params :uuid])]
     (log/info :msg "keepalive" :uuid uuid)
-    {:status 200}))
+    {:status 200 :headers {"Access-Control-Allow-Origin" "*"}}))
 
 (defn handle-ws [{{host :host join :join} :params}]
   (let [data (deref state!)]
