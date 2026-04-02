@@ -89,6 +89,7 @@ jobs:
           mkdir -p _site/play
           cp -r site/web/. _site/
           cp web/index.html _site/play/index.html
+          cp -r web/release/${{ env.OGRES_VERSION }} web/release/latest
           cp -r web/release _site/play/release
           cp web/releases.txt _site/releases.txt
           cp CNAME _site/CNAME
