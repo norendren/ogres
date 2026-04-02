@@ -194,7 +194,11 @@
       (fn []
         (let [user (ds/entity @conn [:db/ident :user])]
           (when (= (:session/status user) :connected)
-            (js/fetch (str "/keepalive?uuid=" (:user/uuid user)))))) [conn]) interval-keepalive)
+            (let [base (-> socket-url
+                           (.replace "wss://" "https://")
+                           (.replace "ws://" "http://")
+                           (.replace "/ws" ""))]
+              (js/fetch (str base "/keepalive?uuid=" (:user/uuid user))))))) [conn]) interval-keepalive)
 
     ;; Subscribe to requests to create a new session, creating a WebSocket
     ;; connection object.
