@@ -114,19 +114,8 @@
 ;; attempt to correct any divergences in state.
 (defmethod on-receive-text :datoms
   [{:keys [data dst]} conn _ _ _ _]
-  (let [user-data (ds/db conn)
-        user-vers (:root/release (ds/entity user-data [:db/ident :root]))
-        host-data (ds/init-db data state/schema)
-        host-vers (:root/release (ds/entity host-data [:db/ident :root]))]
-    (if (not= user-vers host-vers)
-      (let [params (js/URLSearchParams. (.. js/window -location -search))
-            origin (.. js/window -location -origin)
-            path   (.. js/window -location -pathname)]
-        (.set params "r" host-vers)
-        (.replace
-         (.-location js/window)
-         (str origin path "?" (.toString params))))
-      (ds/reset-conn! conn (initialize-player-state host-data dst)))))
+  (let [host-data (ds/init-db data state/schema)]
+    (ds/reset-conn! conn (initialize-player-state host-data dst))))
 
 ;; Handles messages that include a DataScript transaction from another
 ;; connection within the session. These messages can be received at any time
