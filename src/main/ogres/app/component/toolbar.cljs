@@ -97,7 +97,7 @@
           ($ icon {:name "rulers"}))
         ($ action {:name "note" :aria-pressed (= mode :note)}
           ($ icon {:name "journal-bookmark-fill"}))
-        ($ action {:name "scene-focus" :aria-disabled (not (some? (:session/_host result)))}
+        ($ action {:name "scene-focus" :aria-disabled (not (or host (some? (:session/_host result))))}
           ($ icon {:name "camera2" :size 22}))
         ($ action {:name "draw-circle" :aria-pressed (= mode :circle)}
           ($ icon {:name "circle"}))

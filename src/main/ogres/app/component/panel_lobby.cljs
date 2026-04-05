@@ -273,6 +273,12 @@
           [false :connected]   "Connected"))
       ($ :button.button.button-neutral
         {:type "button"
+         :title "Open a local player view in a new tab"
+         :disabled (not host)
+         :on-click #(.open js/window "?local-player" "_blank")}
+        ($ icon {:name "eye-fill" :size 14}) "Player view")
+      ($ :button.button.button-neutral
+        {:type "button"
          :title "Share room link"
          :disabled (not= status :connected)
          :on-click #(.. js/window -navigator -clipboard (writeText (session-url room-key)))}
