@@ -54,7 +54,7 @@
                                  :scene-id scene
                                  :center   center
                                  :scale    scale})))))
-       [conn ch])))
+       [conn ch]))))
 
 (defn ^:private build-player-db
   "Given the host's DB (read from shared IndexedDB), creates a modified DB
