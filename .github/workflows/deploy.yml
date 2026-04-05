@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Read version
+        run: echo "OGRES_VERSION=$(tail -1 web/releases.txt)" >> $GITHUB_ENV
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -59,36 +62,32 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Create output directories
-        run: mkdir -p dist/play/release/latest
-
-      - name: Bundle CSS
+      - name: Build CSS
         run: |
+          mkdir -p dist/play/release/${{ env.OGRES_VERSION }}
           npx esbuild \
             --bundle \
             --minify \
             --loader:.svg=dataurl \
-            --outfile=dist/play/release/latest/ogres.app.css \
+            --outfile=dist/play/release/${{ env.OGRES_VERSION }}/ogres.app.css \
             src/main/ogres/app/resource/root.css
-
-      - name: Copy static assets
-        run: |
-          cp web/release/icons.svg dist/play/release/latest/icons.svg
-          cp web/index.html dist/play/index.html
+          cp web/release/icons.svg dist/play/release/${{ env.OGRES_VERSION }}/icons.svg
 
       - name: Build ClojureScript
         env:
-          OUTPUT_DIR: dist/play/release/latest
-          ASSET_PATH: release/latest
+          OUTPUT_DIR: dist/play/release/${{ env.OGRES_VERSION }}
+          ASSET_PATH: release/${{ env.OGRES_VERSION }}
         run: |
           clojure -M -m shadow.cljs.devtools.cli release app \
-            --config-merge "{:closure-defines {ogres.app.const/VERSION \"latest\" ogres.app.const/PATH \"/play/release/latest\"}}"
+            --config-merge "{:closure-defines {ogres.app.const/VERSION \"${{ env.OGRES_VERSION }}\" ogres.app.const/PATH \"/play/release/${{ env.OGRES_VERSION }}\"}}"
 
-      - name: Copy marketing page
-        run: cp -r site/web/. dist/
-
-      - name: Copy CNAME
-        run: cp CNAME dist/CNAME
+      - name: Assemble site
+        run: |
+          cp web/index.html dist/play/index.html
+          cp -r dist/play/release/${{ env.OGRES_VERSION }} dist/play/release/latest
+          cp web/releases.txt dist/releases.txt
+          cp -r site/web/. dist/
+          cp CNAME dist/CNAME
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
